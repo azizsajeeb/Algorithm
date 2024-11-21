@@ -10,6 +10,9 @@ koto len er suffix and prefix arrey equal
 ex:ababa
 pos 4 porjont 2 len er suf and pre arra equal, cz pre(ab)==suf(ab)
 but pos 5 porjonto 1 len er suf and pre arry equal, pre(a)==suf(a)*/
+
+//using createLPS ftn we can track the max len of suf and pre array/string up to any index
+
 vector<int>createLPS(string pattern,int m){
 
   vector<int>lps(m);
