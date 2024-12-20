@@ -4,21 +4,26 @@
 using namespace std;
 
 #define ll long long
+//CHECKING OVERFLOW
+ll mulmod(ll ans,ll base,ll mod){
+  return __int128(ans)*base%mod;
+}
 
 ll Bigmod(ll base,ll exp,const ll mod){
 
   ll ans=1%mod;
   base= base%mod;
 
-   if(base<0)base+=mod;
+   //if(base<0)base+=mod;
 
     while(exp){
 
        if(exp & 1 ){
-         ans= (ll)ans*base%mod;
+        ans=mulmod(ans,base,mod);
+        // ans= ((ans%mod)* (base%mod))%mod;
        }
 
-       base=(ll)base*base%mod;
+       base=mulmod(base,base,mod);
        exp= exp/2;
     }
 
@@ -33,7 +38,7 @@ if(x==1 || x==n-1){
 }
 
 for(int i=1;i<s;i++){
-  x= (x*x)%n;
+  x= mulmod(x,x,n);
   if(x==n-1)return false;
 }
 
@@ -42,8 +47,8 @@ return true;
 
 bool millerRabin(ll n){
 
-  if(n<4){
-    return n==2 || n==3 ;
+  if(n<2){
+    return false;
   }
     
   int s=0; ll d=n-1;
@@ -53,10 +58,10 @@ while( d%2==0){
   s++;
 }
 
-for(int a:{2,3,5,7,11,13,17,19,23,29,31,37}){
+for(ll a:{2,3,5,7,11,13,17,19,23,29,31,37}){
 
   if(n==a)return true;
-
+if(a>n)break;
   if(check_composite(n,a,d,s)) return false;
 
 
@@ -70,9 +75,9 @@ void solve(){
 ll n;cin>>n;
 
 if(millerRabin(n)){
-  cout<<"prime"<<endl;
+  cout<<"YES"<<endl;
 }
-else cout<<"not prime"<<endl;
+else cout<<"NO"<<endl;
 
 
 }
