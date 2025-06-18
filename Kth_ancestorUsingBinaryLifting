@@ -1,0 +1,72 @@
+class TreeAncestor {
+    int LOG;
+public:
+    vector<int> bfs(vector<vector<int>>& arr,int i){
+        vector<int> res, visited(arr.size(),0);
+        
+        queue<int> q;
+        q.push(i);
+        while(q.empty() == false){
+            int len = q.size();
+            while(len--){
+                int node = q.front();
+                q.pop();
+                
+                visited[node] = 1;
+                
+                //add to res
+                res.push_back(node);
+                for(int j: arr[node]){
+                    if(visited[j]) continue;
+                    q.push(j);
+                }
+            }
+        }
+        return res;
+    }
+    
+
+    vector<vector<int>> dp;
+    
+    TreeAncestor(int n, vector<int>& parent) {
+        //make tree here
+    LOG=0;
+    while((1<<LOG)<=n)LOG++;
+        vector<vector<int>> arr(n);
+        for(int i=1;i<n;++i){
+            arr[parent[i]].push_back(i);
+        }
+        
+        //get order of nodes
+        vector<int> order = bfs(arr,0);
+
+        
+        //init dp
+        dp = vector<vector<int>>(n,vector<int>(LOG,-1));
+        for(int i: order){
+            
+            if(i==0) continue;
+            
+            dp[i][0] = parent[i];
+            for(int j=1;j<LOG;++j){
+                dp[i][j] = dp[ dp[i][j-1] ][j-1];
+                if(dp[i][j] == -1) break;
+            }
+        }
+    }
+    void print(int n){
+        cout<<n<<": ";
+        for(int i: dp[n]){
+            cout<<i<<" ";
+        }cout<<endl;
+    }
+    int getKthAncestor(int node, int k) {
+        for(int i=0;i<LOG;++i){
+            if(k&(1<<i)){
+                node = dp[node][i];
+                if(node == -1) break;
+            }
+        }
+        return node;
+    }
+};
