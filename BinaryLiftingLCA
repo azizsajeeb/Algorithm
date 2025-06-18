@@ -1,0 +1,112 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+const int mxnode=100000;
+int LOG;
+vector<int> adj[mxnode];
+vector<vector<int>>up;
+int depth[mxnode];
+int vis[mxnode];
+
+void dfs(int a,int p){
+
+  vis[a]=1;
+for(int b : adj[a]){
+
+if(vis[b]==1)continue;
+
+  depth[b]= depth[a]+1 ;
+
+  up[b][0]=a;// a is the first parent of b
+
+ for(int j=1;j<LOG;j++){
+  up[b][j]= up[up[b][j-1]][j-1];
+ }
+
+ dfs(b,a);
+
+}
+
+}
+
+int get_lca(int a,int b){
+
+if(depth[a]<depth[b]){
+  swap(a,b);
+}
+
+//get them in the same depth
+int k=depth[a]-depth[b];
+
+for(int j=LOG-1;j>=0;j--){
+  
+   if(k&(1<<j)){
+     a=up[a][j]; // 2^j th parent
+   }
+}
+
+if(a==b){
+  return a;
+}
+
+//now they are in the same depth
+//move both a and b with power of 2
+
+for(int j=LOG-1;j>=0;j--){
+
+if(up[a][j]!=up[b][j]){
+  /*sob cheye upper position jeikhane a!=b true hbe oikhane jabo.
+  then oiter parent e hbe lca*/
+
+   a=up[a][j];
+   b=up[b][j];
+}
+
+
+}
+
+return up[a][0];
+}
+
+
+void solve() {
+
+  int node;cin>>node;
+  int m; cin>>m;
+
+LOG=0;
+ while((1<<LOG)<=node)LOG++;
+
+
+
+ up=vector<vector<int>>(node+1,vector<int>(LOG));
+
+ for(int i=0;i<m;i++){
+   int a,b; cin>>a>>b;
+   adj[a].push_back(b);
+   adj[b].push_back(a);
+ }
+
+memset(depth,0,sizeof(depth));
+memset(vis,0,sizeof(vis));
+
+dfs(1,-1);//root theka
+
+
+int q; cin>>q;
+
+while(q--){
+int nodea,nodeb; cin>>nodea>>nodeb;
+
+cout<<get_lca(nodea,nodeb)<<endl;
+
+
+}
+
+
+}
+
+int  main() {
+   solve();
+}
