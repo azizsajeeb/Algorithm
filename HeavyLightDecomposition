@@ -1,0 +1,140 @@
+/*HLD is used in TREE
+
+decompose:light and heavy chain gula k serial e sajano
+heavy edge: the edge leading to a child with longest subtree
+ligh edge:the edge leading to a child with which is not heavy
+heavy[] :stores the child that is the heavy edge
+head[]: head of its heavy path chain
+pos[] :position of the array in the linerarized array after decomposition
+base[i] :value of the node that appears at position;
+
+
+*/
+#include <bits/stdc++.h>
+using namespace std;
+
+const int N = 200005;
+vector<int> adj[N];
+int parent[N], depth[N], heavy[N], head[N], pos[N], sz[N];
+int cur_pos = 0;
+long long segtree[4 * N], base[N];
+
+int dfs(int u) {
+    sz[u] = 1;
+    int max_sz = 0;
+    for (int v : adj[u]) {
+        if (v != parent[u]) {
+            parent[v] = u;
+            depth[v] = depth[u] + 1;
+            int sub_sz = dfs(v);
+            sz[u] += sub_sz;
+            if (sub_sz > max_sz) {
+                max_sz = sub_sz;
+                heavy[u] = v;
+            }
+        }
+    }
+    return sz[u];
+}
+
+void decompose(int u, int h) {
+    head[u] = h;
+    pos[u] = ++cur_pos;
+    if (heavy[u] != -1)
+        decompose(heavy[u], h);
+    for (int v : adj[u]) {
+        if (v != parent[u] && v != heavy[u]) {
+            decompose(v, v);
+        }
+    }
+}
+
+// Segment Tree
+void build(int node, int l, int r) {
+    if (l == r) {
+        segtree[node] = base[l];
+    } else {
+        int mid = (l + r) / 2;
+        build(node * 2, l, mid);
+        build(node * 2 + 1, mid + 1, r);
+        segtree[node] = segtree[node * 2] + segtree[node * 2 + 1];
+    }
+}
+
+void update(int node, int l, int r, int idx, long long val) {
+    if (l == r) {
+        segtree[node] = val;
+    } else {
+        int mid = (l + r) / 2;
+        if (idx <= mid) update(node * 2, l, mid, idx, val);
+        else update(node * 2 + 1, mid + 1, r, idx, val);
+        segtree[node] = segtree[node * 2] + segtree[node * 2 + 1];
+    }
+}
+
+long long query(int node, int l, int r, int ql, int qr) {
+    if (ql > r || qr < l) return 0;
+    if (ql <= l && r <= qr) return segtree[node];
+    int mid = (l + r) / 2;
+    return query(node * 2, l, mid, ql, qr) +
+           query(node * 2 + 1, mid + 1, r, ql, qr);
+}
+
+// O(log n) path query using HLD
+long long query_path(int u, int v) {
+    long long res = 0;
+    while (head[u] != head[v]) {
+        if (depth[head[u]] < depth[head[v]]) swap(u, v);
+        res += query(1, 1, cur_pos, pos[head[u]], pos[u]);//cur_pos diya final size of array bujay
+        u = parent[head[u]];
+    }
+    if (depth[u] > depth[v]) swap(u, v);
+    res += query(1, 1, cur_pos, pos[u], pos[v]);
+    return res;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n;
+    cin >> n;
+    for (int i = 1; i <= n; i++) heavy[i] = -1;
+
+    for (int i = 0; i < n - 1; i++) {
+        int u, v;
+        cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+
+    vector<long long> nodeVal(n + 1);
+    for (int i = 1; i <= n; i++) cin >> nodeVal[i];
+
+    parent[1] = 0;
+    depth[1] = 0;
+    dfs(1);
+    decompose(1, 1);
+
+    vector<long long> temp(n + 1);
+    for (int i = 1; i <= n; i++) temp[pos[i]] = nodeVal[i]; /*ith pos er node er value er nodevalue temp e assaign*/
+    for (int i = 1; i <= n; i++) base[i] = temp[i];
+
+    build(1, 1, cur_pos);
+
+    int q;
+    cin >> q;
+    while (q--) {
+        int type;
+        cin >> type;
+        if (type == 1) {
+            int u; long long val;
+            cin >> u >> val;
+            update(1, 1, cur_pos, pos[u], val);
+        } else {
+            int u, v;
+            cin >> u >> v;
+            cout << query_path(u, v) << "\n";
+        }
+    }
+}
