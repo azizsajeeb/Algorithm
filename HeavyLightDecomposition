@@ -8,7 +8,7 @@ head[]: head of its heavy path chain
 pos[] :position of the array in the linerarized array after decomposition
 base[i] :value of the node that appears at position;
 
-
+NOTE: try to use iterative segment tree for better complexity, especially memory complexity
 */
 #include <bits/stdc++.h>
 using namespace std;
