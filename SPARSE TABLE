@@ -1,0 +1,66 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+void solve() {
+
+  int n,q; cin>>n; cin>>q;
+  int binarylog[n+1];
+  binarylog[1]=0;
+//process log array
+for(int i=2;i<=n;i++)binarylog[i]= binarylog[i/2] + 1;
+
+int m[n+5][binarylog[n]+1];
+vi v(n);
+
+//m[i][j]= starting at i to all the way to 2^j
+
+
+for(int i=0;i<n;i++){
+  cin>>v[i];
+  m[i][0] = v[i];
+}
+
+
+//preprocess
+//2^j = (2^(j-1) + (2^(j-1)));
+
+for(int k=1;k<=binarylog[n];k++){
+
+  for(int i=0;i + (1<<k)-1 <n ;i++){
+m[i][k] = min(m[i][k-1] , m[i+(1<<(k-1))][k-1]);
+  }
+}
+
+
+
+ while(q--){
+
+
+int l,r; cin>>l>>r;
+
+int len= r-l+1;
+
+
+ int k=binarylog[len];
+
+l--; r--;  
+
+//2 dik thekai max k(2^j) length check korbo tahle i hbe, common arear pabo
+
+int an= min(m[l][k], m[r-(1<<k)+1][k]);
+
+cout<<an<<nl;
+ }
+
+}
+  int main() {
+
+  ios_base::sync_with_stdio(false);
+  cin.tie(0);cout.tie(0);
+  // seive();
+
+   //tc{
+
+          solve();
+   // }
+  }
