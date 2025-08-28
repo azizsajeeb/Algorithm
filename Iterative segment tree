@@ -1,5 +1,10 @@
 // CPP Program to implement iterative segment
-// tree. time(nlogn) space (n)
+/*
+Build: O(n)
+Update: O(log n)
+Range Query: O(log n)
+Space: O(n)
+*/
 #include <bits/stdc++.h>
 #define ll long long
 
