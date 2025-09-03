@@ -1,0 +1,56 @@
+const int size=26;
+const int mxnode=1e5+4;
+int trie[maxnode][size];
+bool isend[mxnode];
+int nodecount = 1;
+int childend[maxnode];
+
+void insert(string &word){
+int node=0;
+  for(auto x:word){
+    int c=x-'a';
+    if(trie[node][c]==0){
+trie[node][c]=nodecount++;
+      childend[node]++;
+      }
+node=trie[node][c];
+  }
+isend[node]=1;
+}
+//search
+bool search(string &word){
+int node=0;
+  for(auto x:word){
+int c=x-'a';
+  if(trie[node][c]==0)return false;
+  node=trie[node][c];
+     }
+  return isend[node];// jodi kono prefix ache kine check korte hoy tahole return true hbe direct;
+  }
+//recursively erase
+bool erase(int node=0,string &word, int depth=0){
+if(depth==word.size()){
+if(!isend[node])return false;//word not present
+  isend[node]=0;
+  return childend[node]=0;//delete if no child
+  }
+
+int c=word[depth]-'a';
+int next= trie[node][c];
+  if(next==0)return false;//word not found
+  bool delete=erase(next,word,depth+1);
+
+if(delete){
+  trie[node][c]=0;
+  childent[node]--;
+  return !isend[node]&&chlident[node]==0;
+  }
+  
+
+return false;
+  
+  }
+
+
+
+
