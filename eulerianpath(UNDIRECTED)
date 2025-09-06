@@ -1,0 +1,85 @@
+  /*in the name of almighty ALLAH*/
+
+  #include <bits/stdc++.h>
+
+  using namespace std;
+const int N = 4e5 + 9;
+
+/*
+all the edges should be in the same connected component
+#directed graph: euler path: for all -> indeg = outdeg or nodes having indeg > outdeg = outdeg > indeg = 1 and for others in = out
+#directed graph: euler circuit: for all -> indeg = outdeg
+*/
+
+//euler path in a directed graph
+//it also finds circuit if it exists
+
+vector<pair<int,int>>adj[N];
+vector<int>ans;
+int done[N];
+int deg[N];
+int vis[N];
+int n;
+
+void dfs(int u){
+    while(done[u]<adj[u].size()){
+
+auto ed= adj[u][done[u]++];
+if(vis[ed.second])continue;// if the edge is visited or not
+
+vis[ed.second]=1;
+dfs(ed.first);
+
+    }
+
+    ans.push_back(u);
+}
+  int main() {
+
+  ios_base::sync_with_stdio(false);
+  cin.tie(0);cout.tie(0);
+  
+  
+cin>>n;
+int edge; cin>>edge;
+memset(vis,0,sizeof(vis));
+
+for(int i=1;i<=edge;i++){
+    int u,v; cin>>u>>v;
+    adj[u].push_back({v,i});
+    adj[v].push_back({u,i});
+    deg[u]++;
+    deg[v]++;
+}
+
+int odd=0,root=0;
+for(int i=1;i<=n;i++){
+    if(deg[i]&1){
+        odd++;
+        root=i;
+    }
+}
+
+if(odd>2){
+    cout<<"NO EULERIAN PATH EXIST\n"; return 0;
+}
+
+if(root==0){
+    for(int i=1;i<=n;i++)if(deg[i])root=i;
+}
+
+if(root==0){
+    cout<<"The graph the empty\n"; return 0;
+}
+
+dfs(root);
+
+if(ans.size()!=edge+1){
+    cout<<"The graph is not connected\n"; return 0;
+}
+  
+  cout<<"Eulerian pathe exist\n";
+  reverse(ans.begin(),ans.end());
+  for(auto x:ans)cout<<x<<" ";
+  cout<<endl;
+  }
