@@ -1,0 +1,77 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+const int N=1e5+2;
+int rootn;
+
+struct  Q{
+    int ind,l,r;
+};
+
+Q query[N];
+
+bool compare(Q a, Q b){
+    if(a.l/rootn == b.l/rootn){
+        return a.r > b.r;
+    }
+  else return a.l<b.l;
+}
+
+int main(){
+  int n;cin>>n;
+  rootn= sqrt(n);
+
+  int queries; cin>>queries;
+  vector<int>a(n);
+  for(int i=0;i<n;i++)cin>>a[i];
+
+ for(int i=0;i<queries;i++){
+    int l,r; cin>>l>>r;
+    query[i].l=l;
+    query[i].r=r;
+    query[i].ind = i;
+ }
+
+ sort(query, query+queries,compare);
+
+ vector<int>ans(queries);
+
+ int cur_l=0, cur_r=-1;
+ int curan=0;
+ int l,r;
+
+ for(int i=0;i<queries;i++){
+    l=query[i].l;
+    r=query[i].r;
+    l--; r--;
+
+    while(cur_r<r){
+        cur_r++;
+        curan+=a[cur_r];
+    }
+
+ while(cur_l>l){
+    cur_l--;
+    curan+=a[cur_l];
+ }
+  
+ while(cur_l<l){
+    curan-=a[cur_l];
+    cur_l++;
+ }
+  
+ while(cur_r>r){
+    curan-=a[cur_r];
+    cur_r--;
+ }
+
+  ans[query[i].ind]=curan;
+
+ }
+
+
+ for(auto x:ans)cout<<x<<endl;
+
+ return 0;
+
+}
