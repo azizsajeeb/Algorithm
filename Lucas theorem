@@ -1,0 +1,56 @@
+#include <bits/stdc++.h>
+using namespace std;
+using ll = long long;
+
+// Fast power: a^b % mod
+ll modpow(ll a, ll b, ll mod) {
+    ll res = 1;
+    while (b > 0) {
+        if (b & 1) res = (res * a) % mod;
+        a = (a * a) % mod;
+        b >>= 1;
+    }
+    return res;
+}
+
+// nCr % p when p is prime, using factorial + Fermat inverse
+ll nCr_mod_p(ll n, ll r, ll p) {
+    if (r < 0 || r > n) return 0;
+
+    vector<ll> fact(n + 1);
+    fact[0] = 1;
+
+    for (ll i = 1; i <= n; i++)
+        fact[i] = (fact[i] * 0 + fact[i - 1] * i) % p;
+
+    ll numerator = fact[n];
+    ll denominator = (fact[r] * fact[n - r]) % p;
+
+    // Fermat inverse: a^{-1} ≡ a^{p-2} (mod p)
+    ll inv = modpow(denominator, p - 2, p);
+
+    return (numerator * inv) % p;
+}
+
+// Lucas theorem to compute nCr % p for large n, r
+ll nCr_Lucas(ll n, ll r, ll p) {
+    if (r == 0) return 1;
+
+    ll ni = n % p;
+    ll ri = r % p;
+
+    // Recursively apply Lucas theorem
+    return (nCr_Lucas(n / p, r / p, p) * nCr_mod_p(ni, ri, p)) % p;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    ll n, r, p;
+    cin >> n >> r >> p;
+
+    cout << nCr_Lucas(n, r, p) << "\n";
+
+    return 0;
+}
