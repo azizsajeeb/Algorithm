@@ -3,10 +3,9 @@ using namespace std;
 #include <ext/pb_ds/assoc_container.hpp>
 using namespace __gnu_pbds;
 
-// --------- CUSTOM HASH (ANTI-HACK) ----------
+// ----------------- CUSTOM HASH -----------------
 struct custom_hash {
     static uint64_t splitmix64(uint64_t x) {
-        // Magic constants for good hashing
         x += 0x9e3779b97f4a7c15;
         x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
         x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
@@ -19,30 +18,100 @@ struct custom_hash {
     }
 };
 
-// --------- SAFE ALIASES ----------
+// ----------------- HASHES FOR COMPLEX KEYS -----------------
+
+// Pair hash
+struct pair_hash {
+    size_t operator()(const pair<int,int> &p) const {
+        return custom_hash{}(uint64_t(p.first) << 32 | p.second);
+    }
+};
+
+// Tuple hash (3 elements)
+struct tuple_hash {
+    template<typename T1, typename T2, typename T3>
+    size_t operator()(const tuple<T1,T2,T3> &t) const {
+        uint64_t h1 = custom_hash{}(uint64_t(get<0>(t)));
+        uint64_t h2 = custom_hash{}(uint64_t(get<1>(t)));
+        uint64_t h3 = custom_hash{}(uint64_t(get<2>(t)));
+        return h1 ^ (h2 << 1) ^ (h3 << 2);
+    }
+};
+
+// Vector hash
+struct vector_hash {
+    size_t operator()(const vector<int> &v) const {
+        uint64_t h = 0;
+        for (auto x : v) h = h * 31 + custom_hash{}(uint64_t(x));
+        return h;
+    }
+};
+
+// ----------------- ALIASES -----------------
+
+// Map for primitive types
 template<typename K, typename V>
 using safe_map = gp_hash_table<K, V, custom_hash>;
 
+// Set for primitive types
 template<typename K>
 using safe_set = gp_hash_table<K, null_type, custom_hash>;
 
-// --------- EXAMPLE USAGE ----------
+// Map for pairs
+template<typename V>
+using pair_map = gp_hash_table<pair<int,int>, V, pair_hash>;
+
+// Set for pairs
+using pair_set = gp_hash_table<pair<int,int>, null_type, pair_hash>;
+
+// Map for tuple<int,int,int>
+template<typename V>
+using tuple_map = gp_hash_table<tuple<int,int,int>, V, tuple_hash>;
+
+// Set for tuple<int,int,int>
+using tuple_set = gp_hash_table<tuple<int,int,int>, null_type, tuple_hash>;
+
+// Map for vector<int>
+template<typename V>
+using vector_map = gp_hash_table<vector<int>, V, vector_hash>;
+
+// Set for vector<int>
+using vector_set = gp_hash_table<vector<int>, null_type, vector_hash>;
+
+// ----------------- USAGE EXAMPLES -----------------
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
-    int n;
-    cin >> n;
-    vector<char> a(n);
-    for (auto &x : a) cin >> x;
+    // int map
+    safe_map<int,int> mp_int;
+    mp_int[5] = 100;
 
-    safe_map<char,int> mp; // fast & hack-proof
+    // long long map
+    safe_map<long long,int> mp_ll;
+    mp_ll[1e18] = 42;
 
-    for (int i = 0; i < n; i++) {
-        int need = 10 - a[i]; // example target sum
-        if (mp.find(a[i]) != mp.end()) {
-            cout << "Found: " << mp[a[i]] << " " << a[i]<< "\n";
-        }
-        mp[a[i]] = i;
-    }
+    // float/double map
+    safe_map<double,int> mp_double;
+    mp_double[3.14] = 7;
+
+    // char map
+    safe_map<char,int> mp_char;
+    mp_char['a'] = 1;
+
+    // pair map
+    pair_map<int> mp_pair;
+    mp_pair[{1,2}] = 55;
+
+    // tuple map
+    tuple_map<int> mp_tuple;
+    mp_tuple[{1,2,3}] = 99;
+
+    // vector map
+    vector_map<int> mp_vector;
+    mp_vector[{1,2,3}] = 777;
+
+    // check existence safely
+    if(mp_int.find(5) != mp_int.end()) cout << "Found 5 in int map\n";
+    if(mp_double.find(3.14) != mp_double.end()) cout << "Found 3.14 in double map\n";
 }
