@@ -1,0 +1,36 @@
+ string s,ss;
+  cin>>ss;
+  int n=(int)ss.size();
+  s.push_back('#');
+  for(int i=0;i<n;i++){
+    s+=ss[i];
+    s+='#';
+  }
+  vector<int>v(2*n+1);
+  int centre=0,right=0,longestlen=0,longestcentre=0;
+
+  for(int i=0;i<(int)s.size();i++){
+    int mirror=2*centre-i;
+    if(right>i){
+        v[i]=min(v[mirror],right-i);
+    }
+    int a=i+(v[i]+1);
+    int b=i-(v[i]+1);
+    while(b>=0 && a<(int)s.size() && s[a]==s[b]){
+        b--;
+        a++;
+        v[i]++;
+    }
+    if(i+v[i]>right){
+        centre=i;
+        right=v[i]+i;
+    }
+    if(v[i]>=longestlen){
+        longestlen=v[i];
+        longestcentre=i;
+    }
+  }
+
+   for(int i=longestcentre-longestlen;i<longestcentre + longestlen; i++){
+    if(s[i]!='#')cout<<s[i];
+   }
